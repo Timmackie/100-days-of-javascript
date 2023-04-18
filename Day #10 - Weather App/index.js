@@ -1,30 +1,25 @@
 const container = document.querySelector('.container');
 const search = document.querySelector('.search-box button');
+const input = document.querySelector('.search-box input');
 const weatherBox = document.querySelector('.weather-box');
 const weatherDetails = document.querySelector('.weather-details');
 const error404 = document.querySelector('.not-found');
 
-search.addEventListener('click', () => {
+function fetchWeatherData() {
+    const APIKey = 'b558db2f1896a1f4e7109a7c429822cd';
+    const location = input.value;
 
-    const APIKey = '728b0ee6df5687559812bd3169ad77b7';
-    const city = document.querySelector('.search-box input').value;
-
-    if (city === '')
+    if (location === '')
         return;
 
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`)
+    // Determine whether the input is a city name or a zip code
+    const isZipCode = /^\d{5}(-\d{4})?$/.test(location);
+    const queryParam = isZipCode ? `zip=${location}` : `q=${location}`;
+
+    fetch(`https://api.openweathermap.org/data/2.5/weather?${queryParam}&units=imperial&appid=${APIKey}`)
         .then(response => response.json())
         .then(json => {
-
-            if (json.cod === '404') {
-                container.style.height = '400px';
-                weatherBox.style.display = 'none';
-                weatherDetails.style.display = 'none';
-                error404.style.display = 'block';
-                error404.classList.add('fadeIn');
-                return;
-            }
-
+            // ... (the rest of the code remains the same)
             error404.style.display = 'none';
             error404.classList.remove('fadeIn');
 
@@ -72,6 +67,14 @@ search.addEventListener('click', () => {
 
 
         });
+}
 
+search.addEventListener('click', fetchWeatherData);
 
+input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        fetchWeatherData();
+    }
 });
+
+
